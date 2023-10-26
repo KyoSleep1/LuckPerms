@@ -52,6 +52,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin implements MixinUser {
 
+    @Shadow public abstract ServerWorld getWorld();
+
     /** Cache a reference to the LP {@link User} instance loaded for this player */
     private User luckperms$user;
 
@@ -60,9 +62,6 @@ public abstract class ServerPlayerEntityMixin implements MixinUser {
      * having to maintain a map of Player->Cache.
      */
     private QueryOptionsCache<ServerPlayerEntity> luckperms$queryOptions;
-
-    // Used by PlayerChangeWorldCallback hook below.
-    @Shadow public abstract ServerWorld getServerWorld();
 
     @Override
     public User getLuckPermsUser() {
@@ -164,6 +163,6 @@ public abstract class ServerPlayerEntityMixin implements MixinUser {
 
     @Inject(at = @At("TAIL"), method = "worldChanged")
     private void luckperms_onChangeDimension(ServerWorld targetWorld, CallbackInfo ci) {
-        PlayerChangeWorldCallback.EVENT.invoker().onChangeWorld(this.getServerWorld(), targetWorld, (ServerPlayerEntity) (Object) this);
+        PlayerChangeWorldCallback.EVENT.invoker().onChangeWorld(this.getWorld(), targetWorld, (ServerPlayerEntity) (Object) this);
     }
 }
